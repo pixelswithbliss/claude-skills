@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "pixel-skills",
+  "description": "Custom Claude Code skills for Pixel With Bliss — content strategy, marketing, and creative business workflows.",
+  "owner": {
+    "name": "Zaheer Fazly",
+    "url": "https://github.com/pixelswithbliss"
+  },
+  "plugins": [
+    {
+      "name": "pixel-skills",
+      "description": "Content strategy, marketing, and creative business workflow skills.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
