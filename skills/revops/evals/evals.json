@@ -4,9 +4,9 @@
     {
       "id": 1,
       "prompt": "Help me set up our lead lifecycle stages. We're a B2B SaaS company selling to mid-market. We use HubSpot as our CRM and have marketing and sales teams that aren't aligned on lead definitions.",
-      "expected_output": "Should check for product-marketing-context.md first. Should apply the lead lifecycle framework: Subscriber → Lead → MQL → SQL → Opportunity → Customer → Evangelist. Should define clear criteria for each stage transition (what makes a Lead become an MQL, etc.). Should address the alignment issue between marketing and sales — define shared definitions and SLAs. Should recommend CRM implementation steps for HubSpot. Should include lead scoring setup. Should provide a handoff process between marketing and sales.",
+      "expected_output": "Should check for product-marketing.md first. Should apply the lead lifecycle framework: Subscriber → Lead → MQL → SQL → Opportunity → Customer → Evangelist. Should define clear criteria for each stage transition (what makes a Lead become an MQL, etc.). Should address the alignment issue between marketing and sales — define shared definitions and SLAs. Should recommend CRM implementation steps for HubSpot. Should include lead scoring setup. Should provide a handoff process between marketing and sales.",
       "assertions": [
-        "Checks for product-marketing-context.md",
+        "Checks for product-marketing.md",
         "Applies lead lifecycle framework with all stages",
         "Defines criteria for each stage transition",
         "Addresses marketing-sales alignment",
@@ -84,6 +84,19 @@
         "Recognizes this as cold email writing, not RevOps",
         "References or defers to cold-email skill",
         "Explains RevOps covers systems and processes, not email content"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Our demo form uses company enrichment before showing a calendar. A valid existing-customer submission already has an owner; the provider times out and then returns a different territory. We also receive the same webhook twice. Design the routing and tell us what to measure.",
+      "expected_output": "Keeps valid submissions and existing ownership, deduplicates the webhook, provides a bounded-wait fallback, and guards late updates. Separates actual rep response from enrichment latency and proposes a shadow/pilot with observed outcomes.",
+      "assertions": [
+        "Does not reject a valid submission because enrichment timed out",
+        "Preserves the existing account owner unless an explicit reassignment rule applies",
+        "Avoids duplicate contacts/tasks/bookings on replay",
+        "Does not silently swap a calendar or owner on late provider output",
+        "Measures both form experience and actual assignment/response outcomes"
       ],
       "files": []
     }

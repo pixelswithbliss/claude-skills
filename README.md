@@ -1,110 +1,111 @@
 # pixel-skills
 
-Custom Claude Code plugin for Pixel With Bliss — **41 marketing skills** that Claude loads on its own when a request matches, or that you can call by name (e.g. `/pixel-skills:cold-email`).
+Marketing skills for Pixel With Bliss — **52 playbooks** that Claude picks automatically when a request matches. You never need to remember their names.
+
+**Version:** synced with [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.13.0 (Oct 19, 2026).
+
+## Install
+
+### Claude app (web, desktop, mobile) — one upload
+1. Download [`bundle/pixel-marketing.zip`](bundle/pixel-marketing.zip).
+2. In Claude: **Customize → Skills → + → Create skill → Upload a skill**, choose the zip, keep it toggled on.
+3. "Code execution and file creation" must be on (Settings → Capabilities).
+
+`pixel-marketing` is one skill that contains all 52 playbooks and routes each request to the right one.
+
+### Claude Code
+```
+/plugin marketplace add pixelswithbliss/claude-skills
+/plugin install pixel-skills@pixel-skills
+```
+Later updates: `/plugin update pixel-skills`
 
 ## Skills
 
-⭐ = most useful for Pixel With Bliss (a solo photo/video business). The rest were written for software/SaaS companies but still work.
+⭐ = most useful for a solo photo/video business. The rest were written for software companies but still work.
 
 ### Content & social
 | Skill | Use it for |
 |---|---|
 | ⭐ `content-strategy` | Planning what content to make — topics, pillars, calendars |
-| ⭐ `social-content` | Instagram, TikTok, Facebook, LinkedIn posts and scheduling |
-| ⭐ `video` | Creating video with AI tools or code-based frameworks |
-| ⭐ `image` | Marketing images — social graphics, banners, mockups |
-| ⭐ `copywriting` | Writing copy for any page (home, about, services) |
+| ⭐ `social` | Instagram, TikTok, Facebook, LinkedIn, YouTube posts |
+| ⭐ `video` | Creating video with AI tools or code |
+| ⭐ `image` | Social graphics, banners, thumbnails, mockups |
+| ⭐ `copywriting` | Writing copy for any page |
 | ⭐ `copy-editing` | Improving or refreshing existing copy |
-| `community-marketing` | Building an online community around the brand |
+| `community-marketing` | Building a community around the brand |
 
-### Getting clients
+### Finding & winning clients
 | Skill | Use it for |
 |---|---|
-| ⭐ `cold-email` | Cold outreach emails and follow-ups that get replies |
-| ⭐ `email-sequence` | Automated email flows and drip campaigns |
+| ⭐ `prospecting` | Finding potential clients and building outreach lists (incl. local businesses) |
+| ⭐ `cold-email` | Cold outreach emails, DMs and follow-ups |
+| ⭐ `emails` | Email sequences and follow-up flows |
+| ⭐ `sms` | SMS and WhatsApp marketing |
+| ⭐ `offers` | Packages, bonuses, guarantees, urgency |
+| ⭐ `pricing` | Prices, packages, tiers |
 | ⭐ `lead-magnets` | Freebies (LUTs, guides) that collect emails |
-| ⭐ `pricing-strategy` | Setting prices and packages |
-| ⭐ `sales-enablement` | Pitch decks, one-pagers, objection handling |
-| ⭐ `marketing-ideas` | Brainstorming marketing ideas |
-| ⭐ `marketing-psychology` | Using behavioral science in marketing |
+| ⭐ `sales-enablement` | Pitch decks, one-pagers, proposals |
+| ⭐ `events` | Getting clients from events, meetups, workshops |
+| ⭐ `influencer-marketing` | Creator and ambassador partnerships |
+| ⭐ `co-marketing` | Joint campaigns with venues, planners, brands |
+| ⭐ `referrals` | Referrals and word of mouth |
+| ⭐ `public-relations` | Press and media coverage |
 | ⭐ `customer-research` | Understanding what clients want |
-| ⭐ `co-marketing` | Partnerships and joint campaigns (venues, planners) |
-| `referral-program` | Referral and word-of-mouth programs |
-| `free-tool-strategy` | Building a free tool as a marketing magnet |
-| `launch-strategy` | Planning a launch or announcement |
+
+### Strategy & ideas
+| Skill | Use it for |
+|---|---|
+| ⭐ `marketing-plan` | A full marketing plan |
+| ⭐ `marketing-ideas` | Brainstorming ideas |
+| ⭐ `marketing-psychology` | Behavioral science in marketing |
+| ⭐ `product-marketing` | Business profile the other skills read first |
+| ⭐ `competitor-profiling` | Researching competitors |
+| `marketing-council` | Several expert perspectives on one decision |
+| `marketing-loops` | Recurring marketing workflows on a schedule |
+| `launch` | Launching a new service or offer |
+| `free-tools` | A free tool as a marketing magnet |
 
 ### Ads
 | Skill | Use it for |
 |---|---|
-| ⭐ `paid-ads` | Google, Meta (Facebook/Instagram), LinkedIn ad campaigns |
-| ⭐ `ad-creative` | Ad headlines, text, and variations |
-| `ab-test-setup` | Planning A/B tests |
+| ⭐ `ads` | Google, Meta, TikTok, LinkedIn ad campaigns |
+| ⭐ `ad-creative` | Ad headlines, text, variations |
+| `ab-testing` | A/B tests |
 
-### Website, SEO & conversions
+### Website, SEO & tracking
 | Skill | Use it for |
 |---|---|
-| ⭐ `seo-audit` | Finding SEO problems on the site |
+| ⭐ `seo-audit` | Finding SEO problems |
 | ⭐ `ai-seo` | Getting found in ChatGPT / AI answers |
-| ⭐ `schema-markup` | Structured data so Google understands the site |
-| ⭐ `page-cro` | Making a page convert more visitors |
-| ⭐ `form-cro` | Improving the booking/contact form |
+| ⭐ `schema` | Structured data (LocalBusiness, reviews, FAQ) |
+| ⭐ `cro` | Making a page or booking form convert more |
+| `link-building` | Earning backlinks |
 | `site-architecture` | Page structure, navigation, URLs |
 | `programmatic-seo` | Many SEO pages from a template |
-| `competitor-alternatives` | "X vs Y" comparison pages |
-| `directory-submissions` | Listing the business in directories for backlinks |
-| `popup-cro` | Popups and banners |
-| `analytics-tracking` | Setting up analytics and tracking |
+| `competitors` | "X vs Y" comparison pages |
+| `directory-submissions` | Directory listings for backlinks |
+| `popups` | Popups and banners |
+| `analytics` | Analytics setup |
+| `conversion-tracking` | Tracking bookings into Google Ads, Meta, GA4 |
+| `attribution` | Which marketing brings clients |
+| `revops` | Lead lifecycle and CRM stages |
 
-### Research & setup
-| Skill | Use it for |
-|---|---|
-| ⭐ `product-marketing-context` | Creates a business profile doc the other skills read first — **run this one first** |
-| ⭐ `competitor-profiling` | Researching competitors from their URLs |
-| `revops` | Lead lifecycle and sales handoff |
+### Software/app products (rarely needed)
+`signup`, `onboarding`, `paywalls`, `churn-prevention`, `aso`
 
-### SaaS / app-specific (rarely needed)
-`signup-flow-cro`, `onboarding-cro`, `paywall-upgrade-cro`, `churn-prevention`, `aso-audit`
+## Updating from upstream
 
-## Install
+1. Copy the latest `skills/`, `tools/` and `LICENSE` from coreyhaines31/marketingskills.
+2. Run `python3 scripts/build_bundle.py . bundle` — it stops and names any new or removed skill so you can add it to the index in the script.
+3. Commit, push, and re-upload `bundle/pixel-marketing.zip` in Claude.
 
-In the Claude Code terminal, add the marketplace once, then install:
-```
-/plugin marketplace add pixelswithbliss/claude-skills
-/plugin install pixel-skills@pixel-skills
-```
-
-Or add to `~/.claude/settings.json`:
-```json
-"extraKnownMarketplaces": {
-  "pixel-skills": {
-    "source": {
-      "source": "github",
-      "repo": "pixelswithbliss/claude-skills"
-    }
-  }
-},
-"enabledPlugins": {
-  "pixel-skills@pixel-skills": true
-}
-```
-
-## Use in the Claude app (claude.ai / desktop / mobile)
-
-The app can't install this plugin directly, so it uses a single bundled skill, **pixel-marketing**, that contains all 41 playbooks and picks the right one automatically.
-
-Rebuild it after changing skills:
-```
-python3 scripts/build_bundle.py skills dist
-```
-Then upload `dist/pixel-marketing.zip` in Claude under Customize → Skills (replace the old one).
-
-## Adding New Skills
-
-1. Create folder: `skills/<skill-name>/`
-2. Add `SKILL.md` with frontmatter (`name`, `description`) — `name` must match the folder name
-3. Commit and push to GitHub
-4. Run `/plugin update pixel-skills` in Claude Code to pull latest
+## Repo layout
+- `skills/` — the 52 skills (Claude Code plugin)
+- `tools/` — tool and integration notes the skills link to (◆ = sponsored partner of the upstream project)
+- `bundle/pixel-marketing.zip` — the one-upload version for the Claude app
+- `scripts/build_bundle.py` — builds that zip
 
 ## Credits
 
-The 41 skills come from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) by Corey Haines, used under the MIT License (see `LICENSE`). Imported May 2026; upstream has since reorganized and added skills.
+Skills by [Corey Haines](https://github.com/coreyhaines31/marketingskills), used under the MIT License (see `LICENSE`).

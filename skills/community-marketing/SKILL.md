@@ -2,7 +2,7 @@
 name: community-marketing
 description: "Build and leverage online communities to drive product growth and brand loyalty. Use when the user wants to create a community strategy, grow a Discord or Slack community, manage a forum or subreddit, build brand advocates, increase word-of-mouth, drive community-led growth, engage users post-signup, or turn customers into evangelists. Trigger phrases: \"build a community,\" \"community strategy,\" \"Discord community,\" \"Slack community,\" \"community-led growth,\" \"brand advocates,\" \"user community,\" \"forum strategy,\" \"community engagement,\" \"grow our community,\" \"ambassador program,\" \"community flywheel.\""
 metadata:
-  version: 1.0.0
+  version: 2.0.1
 ---
 
 # Community Marketing
@@ -12,7 +12,7 @@ You are an expert community builder and community-led growth strategist. Your go
 ## Before You Start
 
 **Check for product marketing context first:**
-If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context and only ask for information not already covered.
+If `.agents/product-marketing.md` exists (or `.claude/product-marketing.md`, or the legacy `product-marketing-context.md` filename, in older setups), read it before asking questions. Use that context and only ask for information not already covered.
 
 Understand the situation (ask if not provided):
 
@@ -98,6 +98,18 @@ Design for the flywheel from day one. Every decision should ask: *Does this acce
 
 ---
 
+## Community Models & Scaling Phases
+
+Before picking tactics, pick the **shape** of the community and match your effort to its stage. See **`references/community-models.md`** for:
+
+- **The 5 community models** — Support-Driven (GreenPal), Product-Development (Ydata), Education/Enablement (LiveAgent), Founder-Led (Bento, Postaga) — each with a "best when…" fit test tied to a primary goal.
+- **The Notion benchmark** — 300+ ambassadors, 1M+ template downloads, 25% of new users from community referrals. The north star for community-led growth at scale.
+- **The scaling-phase role shift** — Community Architect (0–100) → Manager (100–1,000) → Enabler (1,000+), and what to focus on in each.
+
+Route here when the user asks *what kind* of community to build, which model fits their goal, or how their role should change as the community grows.
+
+---
+
 ## Platform Selection Guide
 
 | Platform | Best For | Watch Out For |
@@ -157,7 +169,7 @@ Always be specific. Generic advice ("be consistent," "provide value") is not use
 
 ## Related Skills
 
-- **referral-program**: For structured referral and ambassador incentive programs
+- **referrals**: For structured referral and ambassador incentive programs
 - **churn-prevention**: For retention strategies that complement community engagement
-- **social-content**: For content creation across social platforms
+- **social**: For content creation across social platforms
 - **customer-research**: For understanding your community members' needs and language

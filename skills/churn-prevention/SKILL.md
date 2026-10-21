@@ -1,8 +1,8 @@
 ---
 name: churn-prevention
-description: "When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' 'involuntary churn,' 'people keep canceling,' 'churn rate is too high,' 'how do I keep users,' or 'customers are leaving.' Use this whenever someone is losing subscribers or wants to build systems to prevent it. For post-cancel win-back email sequences, see email-sequence. For in-app upgrade paywalls, see paywall-upgrade-cro."
+description: "When the user wants to reduce churn, build cancellation flows, set up save offers, recover failed payments, or implement retention strategies. Also use when the user mentions 'churn,' 'cancel flow,' 'offboarding,' 'save offer,' 'dunning,' 'failed payment recovery,' 'win-back,' 'retention,' 'exit survey,' 'pause subscription,' 'involuntary churn,' 'people keep canceling,' 'churn rate is too high,' 'how do I keep users,' or 'customers are leaving.' Use this whenever someone is losing subscribers or wants to build systems to prevent it. For post-cancel win-back email sequences, see emails. For in-app upgrade paywalls, see paywalls."
 metadata:
-  version: 1.1.0
+  version: 2.0.3
 ---
 
 # Churn Prevention
@@ -12,7 +12,7 @@ You are an expert in SaaS retention and churn prevention. Your goal is to help r
 ## Before Starting
 
 **Check for product marketing context first:**
-If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+If `.agents/product-marketing.md` exists (or `.claude/product-marketing.md`, or the legacy `product-marketing-context.md` filename, in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
 Gather this context (ask if not provided):
 
@@ -222,11 +222,19 @@ Track these leading indicators of churn:
 | Billing page visits increase | High | Days before cancel |
 | Team seats removed | High | 1-2 weeks before cancel |
 | Data export initiated | Critical | Days before cancel |
-| NPS score drops below 6 | Medium | 1-3 months before cancel |
+| Individual recommendation rating is 0–6 (detractor) | Medium | 1-3 months before cancel |
 
 ### Health Score Model
 
-Build a simple health score (0-100) from weighted signals:
+Build a simple health score (0-100) from weighted signals. Define every component on the **same 0–100 scale**, where higher means healthier, before applying weights. Use documented product-specific mappings for raw usage, sentiment, and billing values; do not add login counts, a 1–5 sentiment rating, and a percentage directly. The weights below are an illustrative starting point, not validated churn predictions.
+
+Treat missing or stale signals as unavailable, rather than automatically healthy or zero. Set freshness windows and a minimum coverage policy before using the score. If the policy permits a partial score, compute `sum(weight × observed score) / sum(observed weights)` and report coverage (the sum of observed weights) alongside it; otherwise return “insufficient data.” All unavailable means no score. For example, only login (80) and feature usage (60) produce `(0.30×80 + 0.25×60)/0.55 = 70.91`, with 55% coverage. Do not promote that partial score into a healthy-account action without meeting the coverage policy.
+
+An individual rating of 0–6 is a detractor; aggregate NPS (−100 to 100) is a different measure.
+
+[Gainsight's measure-weight documentation](https://support.gainsight.com/gainsight_nxt/05Scorecards/02Admin_Guides/Measure_Weights_in_Scorecards) explains redistribution for unavailable measures.
+
+Illustrative complete-data model:
 
 ```
 Health Score = (
@@ -237,6 +245,8 @@ Health Score = (
   Engagement score      × 0.15
 )
 ```
+
+Validate score mappings and intervention thresholds against later observed renewal/churn outcomes before operational use; the following tiers are illustrative.
 
 | Score | Status | Action |
 |-------|--------|--------|
@@ -252,7 +262,7 @@ Health Score = (
 | Trigger | Intervention |
 |---------|-------------|
 | Usage drop >50% for 2 weeks | "We noticed you haven't used [feature]. Need help?" email |
-| Approaching plan limit | Upgrade nudge (not a wall — paywall-upgrade-cro handles this) |
+| Approaching plan limit | Upgrade nudge (not a wall — paywalls handles this) |
 | No login for 14 days | Re-engagement email with recent product updates |
 | NPS detractor (0-6) | Personal follow-up within 24 hours |
 | Support ticket unresolved >48h | Escalation + proactive status update |
@@ -360,7 +370,7 @@ Test one variable at a time:
 | Offer presentation (modal vs full page) | Full page gets more attention | Save rate |
 | Copy tone (empathetic vs direct) | Empathetic reduces friction | Save rate |
 
-**How to run cancel flow experiments:** Use the **ab-test-setup** skill to design statistically rigorous tests. PostHog is a good fit for cancel flow experiments — its feature flags can split users into different flows server-side, and its funnel analytics track each step of the cancel flow (survey → offer → accept/decline → confirm). See the [PostHog integration guide](../../tools/integrations/posthog.md) for setup.
+**How to run cancel flow experiments:** Use the **ab-testing** skill to design statistically rigorous tests. PostHog is a good fit for cancel flow experiments — its feature flags can split users into different flows server-side, and its funnel analytics track each step of the cancel flow (survey → offer → accept/decline → confirm). See the [PostHog integration guide](https://github.com/coreyhaines31/marketingskills/blob/main/tools/integrations/posthog.md) for setup.
 
 ---
 
@@ -381,7 +391,7 @@ Test one variable at a time:
 
 ## Tool Integrations
 
-For implementation, see the [tools registry](../../tools/REGISTRY.md).
+For implementation, see the [tools registry](https://github.com/coreyhaines31/marketingskills/blob/main/tools/REGISTRY.md).
 
 ### Retention Platforms
 
@@ -416,9 +426,9 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md).
 
 ## Related Skills
 
-- **email-sequence**: For win-back email sequences after cancellation
-- **paywall-upgrade-cro**: For in-app upgrade moments and trial expiration
-- **pricing-strategy**: For plan structure and annual discount strategy
-- **onboarding-cro**: For activation to prevent early churn
-- **analytics-tracking**: For setting up churn signal events
-- **ab-test-setup**: For testing cancel flow variations with statistical rigor
+- **emails**: For win-back email sequences after cancellation
+- **paywalls**: For in-app upgrade moments and trial expiration
+- **pricing**: For plan structure and annual discount strategy
+- **onboarding**: For activation to prevent early churn
+- **analytics**: For setting up churn signal events
+- **ab-testing**: For testing cancel flow variations with statistical rigor
