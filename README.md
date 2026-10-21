@@ -88,6 +88,16 @@ Or add to `~/.claude/settings.json`:
 }
 ```
 
+## Use in the Claude app (claude.ai / desktop / mobile)
+
+The app can't install this plugin directly, so it uses a single bundled skill, **pixel-marketing**, that contains all 41 playbooks and picks the right one automatically.
+
+Rebuild it after changing skills:
+```
+python3 scripts/build_bundle.py skills dist
+```
+Then upload `dist/pixel-marketing.zip` in Claude under Customize → Skills (replace the old one).
+
 ## Adding New Skills
 
 1. Create folder: `skills/<skill-name>/`
