@@ -90,23 +90,82 @@ if sorted(listed) != present:
 root = OUT / NAME
 if root.exists():
     shutil.rmtree(root)
+# claude.ai rejects skill zips with more than 200 files, so every playbook becomes ONE
+# file: its guide first, then each extra file (references, assets, scripts) appended as
+# a "## File: <path>" section, with a line-number index at the top.
+LANG = {".json": "json", ".js": "javascript", ".py": "python", ".html": "html", ".csv": "csv",
+        ".yaml": "yaml", ".yml": "yaml", ".sh": "bash", ".ts": "typescript"}
+
+
+def section(rel, path):
+    text = path.read_text(errors="ignore")
+    if path.suffix != ".md":
+        text = f"```{LANG.get(path.suffix, '')}\n{text.rstrip()}\n```"
+    return f"## File: {rel}\n\n{text.strip()}\n"
+
+
+def merge(title, main_text, extras):
+    """extras = [(relpath, Path)]; returns one markdown doc with a line index."""
+    parts = [section(rel, p) for rel, p in extras]
+    head = f"<!-- {title} -->\n"
+    if not parts:
+        return head + main_text
+    body = main_text.rstrip() + "\n\n---\n# Bundled files\n\n" + "\n".join(parts)
+
+    def assemble(nums):
+        index = ["<!-- Bundled files in this playbook (open by line number or search for '## File: <path>'):"]
+        index += [f"  - {rel} -> line {n}" for (rel, _), n in zip(extras, nums)]
+        index += ["-->", ""]
+        return head + "\n".join(index) + "\n" + body
+
+    # The index has a fixed number of lines, so build once with placeholders,
+    # read the real line of each header, then fill the numbers in.
+    lines = assemble([0] * len(extras)).split("\n")
+    marker = lines.index("# Bundled files")
+    nums, i = [], marker
+    for rel, _ in extras:
+        i = lines.index(f"## File: {rel}", i + 1)
+        nums.append(i + 1)
+    out = assemble(nums)
+    check = out.split("\n")
+    assert all(check[n - 1] == f"## File: {rel}" for (rel, _), n in zip(extras, nums)), title
+    return out
+
+
 pb = root / "playbooks"
+pb.mkdir(parents=True)
 for name in present:
-    dst = pb / name
-    shutil.copytree(SRC / name, dst, ignore=shutil.ignore_patterns("evals"))
-    # Only ONE SKILL.md in the bundle: playbooks become GUIDE.md without frontmatter.
-    text = (dst / "SKILL.md").read_text()
-    text = re.sub(r"^---\n.*?\n---\n", "", text, count=1, flags=re.S)
-    (dst / "GUIDE.md").write_text(f"<!-- playbook: {name} -->\n" + text.lstrip())
-    (dst / "SKILL.md").unlink()
-    # Links to other skills' SKILL.md must follow the rename.
-    for md in dst.rglob("*.md"):
-        s = md.read_text(errors="ignore")
-        fixed = re.sub(r"(\]\([^)\s]*?)SKILL\.md(?=[)#])", r"\1GUIDE.md", s)
-        if fixed != s:
-            md.write_text(fixed)
-if (REPO / "tools").is_dir():
-    shutil.copytree(REPO / "tools", root / "tools")
+    sdir = SRC / name
+    main = re.sub(r"^---\n.*?\n---\n", "", (sdir / "SKILL.md").read_text(), count=1, flags=re.S)
+    extras = [(str(p.relative_to(sdir)), p) for p in sorted(sdir.rglob("*"))
+              if p.is_file() and p.name != "SKILL.md" and "evals" not in p.relative_to(sdir).parts]
+    doc = merge(f"playbook: {name}", main.lstrip(), extras)
+    # Cross-file links become explicit, relative to the skill root (no new lines added,
+    # so the line index stays exact):
+    #   ../../X/SKILL.md            -> playbooks/X.md
+    #   ../../X/references/y.md     -> playbooks/X.md § references/y.md
+    #   ../../tools/integrations/z  -> TOOLS.md § tools/integrations/z
+    #   ../SKILL.md (own guide)     -> playbooks/<name>.md
+    doc = re.sub(r"\]\((?:\.\./)+tools/([^)\s]+)\)", r"](TOOLS.md § tools/\1)", doc)
+    doc = re.sub(r"\]\((?:\.\./)+([a-z0-9-]+)/SKILL\.md", r"](playbooks/\1.md", doc)
+    doc = re.sub(r"\]\((?:\.\./){2,}([a-z0-9-]+)/((?:references|assets|scripts)/[^)\s]+)\)",
+                 r"](playbooks/\1.md § \2)", doc)
+    doc = re.sub(r"\]\((?:\.\./)+SKILL\.md", f"](playbooks/{name}.md", doc)
+    # A bare "other-playbook.md" link with no sibling file of that name means the
+    # playbook itself (upstream retired ads/references/conversion-tracking.md this way).
+    own = {Path(rel).name for rel, _ in extras}
+    for other in present:
+        if f"{other}.md" not in own:
+            doc = doc.replace(f"]({other}.md)", f"](playbooks/{other}.md)")
+    (pb / f"{name}.md").write_text(doc)
+
+tools = REPO / "tools"
+if tools.is_dir():
+    keep = [tools / f for f in ("REGISTRY.md", "SETUP.md", "PARTNERS.md") if (tools / f).exists()]
+    keep += sorted((tools / "integrations").glob("*.md"))
+    (root / "TOOLS.md").write_text(
+        merge("tools: registry and integration notes", "# Tools\n",
+              [(str(p.relative_to(REPO)), p) for p in keep]))
 
 rows = []
 for title, items in GROUPS:
@@ -125,17 +184,18 @@ This skill bundles {len(present)} expert marketing playbooks. The user should ne
 ## How to use
 
 1. Match the request to **1 playbook** (2 at most if it clearly spans both, e.g. `prospecting` + `cold-email`).
-2. Read `playbooks/<name>/GUIDE.md` in full before answering. Paths inside a guide such as `references/x.md` or `../assets/...` are relative to that guide's own folder — open them when the guide says to.
-3. Paths that start with `tools/` (e.g. `tools/REGISTRY.md`, `tools/integrations/x.md`) are at the root of this skill, next to this file.
-4. When a guide says "see <other-skill>" or "use the <other-skill> skill", open `playbooks/<other-skill>/GUIDE.md`.
-5. If nothing in the index fits, answer normally — don't force a playbook.
-6. Don't announce which playbook you loaded unless asked; just do the work.
+2. Open `playbooks/<name>.md`. Read the main guide (everything above the "# Bundled files" line) in full before answering.
+3. Each playbook file also contains its extra files — `references/...`, `assets/...`, `scripts/...` — as sections headed `## File: <path>`. The comment at the top of the file lists each one with its line number. When the guide mentions such a path (including `../assets/...`), open that section only; don't read every section. Inside a bundled section, a bare link like `other-file.md` means the file next to it in the same folder (e.g. `references/other-file.md`).
+4. Paths starting with `tools/` (e.g. `tools/REGISTRY.md`, `tools/integrations/x.md`) are sections of `TOOLS.md` at the root of this skill, indexed the same way.
+5. When a guide says "see <other-skill>" or "use the <other-skill> skill", open `playbooks/<other-skill>.md`. Links starting with `playbooks/` or `TOOLS.md` are relative to this skill's root; `X.md § path` means "the `## File: path` section of X.md".
+6. If nothing in the index fits, answer normally — don't force a playbook.
+7. Don't announce which playbook you loaded unless asked; just do the work.
 
 ## Business context
 
 Guides ask you to read files like `.agents/product-marketing.md`. Those usually won't exist here. Instead, use what you already know about the user and their business (profile, memory, the conversation), and only ask for details you truly can't infer. If the user wants a reusable business profile written, use `product-marketing`.
 
-Many playbooks were written for software (SaaS) companies. When the user runs a service business (for example photography, videography, events), translate the advice: "signup" → inquiry or booking, "product" → service package, "users" → clients, "trial" → consultation call. Tools listed in `tools/` include sponsored partners (marked ◆); prefer free or already-used options unless the user asks.
+Many playbooks were written for software (SaaS) companies. When the user runs a service business (for example photography, videography, events), translate the advice: "signup" → inquiry or booking, "product" → service package, "users" → clients, "trial" → consultation call. Tools listed in `TOOLS.md` include sponsored partners (marked ◆); prefer free or already-used options unless the user asks.
 
 ## Index
 {chr(10).join(rows)}
@@ -152,5 +212,6 @@ with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
     for f in sorted(root.rglob("*")):
         if f.is_file():
             z.write(f, f.relative_to(OUT))
+assert sum(1 for f in root.rglob("*") if f.is_file()) < 200, "claude.ai rejects skill zips with 200+ files"
 shutil.rmtree(root)  # keep only the zip
 print(zpath, len(present), "playbooks", f"desc={len(DESC)} chars")

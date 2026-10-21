@@ -103,7 +103,7 @@ Later updates: `/plugin update pixel-skills`
 ## Repo layout
 - `skills/` — the 52 skills (Claude Code plugin)
 - `tools/` — tool and integration notes the skills link to (◆ = sponsored partner of the upstream project)
-- `bundle/pixel-marketing.zip` — the one-upload version for the Claude app
+- `bundle/pixel-marketing.zip` — the one-upload version for the Claude app (55 files; the app rejects zips with 200+ files, so each playbook is merged into one file)
 - `scripts/build_bundle.py` — builds that zip
 
 ## Credits
