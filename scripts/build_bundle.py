@@ -2,6 +2,7 @@
 
 Usage:  python3 scripts/build_bundle.py <repo-root> <output-dir>
 Output: <output-dir>/pixel-marketing.zip  (upload in Claude: Customize -> Skills)
+        <output-dir>/<name>.zip for each skill in STANDALONE (uploaded separately)
 """
 import re, shutil, sys, zipfile
 from pathlib import Path
@@ -13,6 +14,16 @@ NAME = "pixel-marketing"
 DESC = ("Marketing playbooks for content, social posts, video, finding clients, cold email, offers, "
         "pricing, ads, SEO, website copy and conversions. Use for any marketing task.")
 assert len(DESC) <= 200 and ":" not in DESC, len(DESC)
+
+# Skills that are NOT marketing playbooks. They stay in skills/ for Claude Code but get
+# their own zip instead of joining the router. Value = short app description (<=200 chars,
+# no colon), used because the upstream description is longer than claude.ai allows.
+STANDALONE = {
+    "humanizer": ("Rewrite AI-sounding text so it reads like a person wrote it, without changing "
+                  "what it says. Use when editing or reviewing drafts, captions, emails or posts for AI tells."),
+}
+for _d in STANDALONE.values():
+    assert len(_d) <= 200 and ":" not in _d, len(_d)
 
 GROUPS = [
     ("Content & social", [
@@ -82,7 +93,7 @@ GROUPS = [
 ]
 
 listed = [n for _, items in GROUPS for n, _ in items]
-present = sorted(p.name for p in SRC.iterdir() if (p / "SKILL.md").exists())
+present = sorted(p.name for p in SRC.iterdir() if (p / "SKILL.md").exists() and p.name not in STANDALONE)
 if sorted(listed) != present:
     sys.exit(f"Index out of sync with skills/: {sorted(set(listed) ^ set(present))} "
              "-- add/remove them in GROUPS in this script.")
@@ -215,3 +226,21 @@ with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
 assert sum(1 for f in root.rglob("*") if f.is_file()) < 200, "claude.ai rejects skill zips with 200+ files"
 shutil.rmtree(root)  # keep only the zip
 print(zpath, len(present), "playbooks", f"desc={len(DESC)} chars")
+
+
+# Standalone skills: one top-level folder named like the skill, upstream files as-is,
+# only the frontmatter description swapped for the short one.
+for sname, sdesc in STANDALONE.items():
+    sdir = SRC / sname
+    files = [f for f in sorted(sdir.rglob("*")) if f.is_file()]
+    assert len(files) < 200, sname
+    text = (sdir / "SKILL.md").read_text()
+    new, n = re.subn(r"^(---\nname: [^\n]+\n)description:.*?\n(?=[a-z_]+:|---)",
+                     lambda m: m.group(1) + f"description: {sdesc}\n", text, count=1, flags=re.S)
+    assert n == 1, f"{sname}: could not rewrite description"
+    spath = OUT / f"{sname}.zip"
+    with zipfile.ZipFile(spath, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in files:
+            arc = f"{sname}/{f.relative_to(sdir)}"
+            z.writestr(arc, new) if f.name == "SKILL.md" else z.write(f, arc)
+    print(spath, len(files), "files", f"desc={len(sdesc)} chars")

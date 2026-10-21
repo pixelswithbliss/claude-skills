@@ -2,6 +2,8 @@
 
 Marketing skills for Pixel With Bliss — **52 playbooks** that Claude picks automatically when a request matches. You never need to remember their names.
 
+Plus **`humanizer`** — strips AI tells from captions, emails and posts so they sound like you.
+
 **Version:** synced with [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) v2.13.0 (Oct 19, 2026).
 
 ## Install
@@ -13,12 +15,26 @@ Marketing skills for Pixel With Bliss — **52 playbooks** that Claude picks aut
 
 `pixel-marketing` is one skill that contains all 52 playbooks and routes each request to the right one.
 
+For the humanizer, upload [`bundle/humanizer.zip`](bundle/humanizer.zip) the same way (it's a separate skill).
+
 ### Claude Code
 ```
 /plugin marketplace add pixelswithbliss/claude-skills
 /plugin install pixel-skills@pixel-skills
 ```
 Later updates: `/plugin update pixel-skills`
+
+This installs the 52 marketing skills **and** `humanizer`.
+
+## Humanizer
+
+| Skill | Use it for |
+|---|---|
+| ⭐ `humanizer` | Rewriting AI-sounding text so it reads like a person wrote it — without changing what it says. Catches "not X but Y" contrasts, forced lists of three, dash overuse, sales language, stock AI words, filler |
+
+Try: *"humanize this caption"* or *"review this email for AI tells."*
+
+**Version:** [blader/humanizer](https://github.com/blader/humanizer) v3.1.0 (Oct 16, 2026). Copied as-is; only the app zip uses a shorter description (claude.ai's 200-character limit).
 
 ## Skills
 
@@ -100,12 +116,16 @@ Later updates: `/plugin update pixel-skills`
 2. Run `python3 scripts/build_bundle.py . bundle` — it stops and names any new or removed skill so you can add it to the index in the script.
 3. Commit, push, and re-upload `bundle/pixel-marketing.zip` in Claude.
 
+**Humanizer:** copy `SKILL.md` and `LICENSE` from blader/humanizer into `skills/humanizer/`, run the same build command, then re-upload `bundle/humanizer.zip`. Check the upstream version in `SKILL.md` → `metadata.version`.
+
 ## Repo layout
-- `skills/` — the 52 skills (Claude Code plugin)
+- `skills/` — the 52 marketing skills + `humanizer` (Claude Code plugin)
 - `tools/` — tool and integration notes the skills link to (◆ = sponsored partner of the upstream project)
 - `bundle/pixel-marketing.zip` — the one-upload version for the Claude app (55 files; the app rejects zips with 200+ files, so each playbook is merged into one file)
-- `scripts/build_bundle.py` — builds that zip
+- `bundle/humanizer.zip` — the humanizer for the Claude app
+- `scripts/build_bundle.py` — builds both zips (skills listed in `STANDALONE` get their own zip instead of joining the router)
 
 ## Credits
 
-Skills by [Corey Haines](https://github.com/coreyhaines31/marketingskills), used under the MIT License (see `LICENSE`).
+Marketing skills by [Corey Haines](https://github.com/coreyhaines31/marketingskills), used under the MIT License (see `LICENSE`).
+Humanizer by [Siqi Chen](https://github.com/blader/humanizer), used under the MIT License (see `skills/humanizer/LICENSE`).
